@@ -1,0 +1,26 @@
+def sumar(num1, num2):
+    return num1 + num2
+
+# Función para restar dos números
+def restar(num1, num2):
+    return num1 - num2
+
+# Función para multiplicar dos números
+def multiplicar(num1, num2):
+    return num1 * num2
+
+# Función para dividir dos números
+def dividir(num1, num2):
+    if num2 != 0:
+        return num1 / num2
+    else:
+        return "Error: No se puede dividir por cero."
+
+# Función para mostrar el menú de opciones
+def mostrar_menu():
+    print("Calculadora Básica")
+    print("1. Sumar")
+    print("2. Restar")
+    print("3. Multiplicar")
+    print("4. Dividir")
+    print("5. Salir")
