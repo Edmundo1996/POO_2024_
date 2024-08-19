@@ -1,0 +1,67 @@
+import bcrypt
+from funcionesBD import Utilidades
+from personas import Gerente, Empleados, Cliente
+
+def iniciar_sesion(email, contra):
+    query_empleado = """
+    SELECT id_empleado, nombre, apellido, email, password, puesto
+    FROM EMPLEADOS
+    WHERE email = %s
+    """
+    
+    cursor, conexion = Utilidades.cursor()
+    
+    if cursor is None or conexion is None:
+        print("No se pudo conectar a la base de datos")
+        return None
+    
+    try:
+        cursor.execute(query_empleado, (email,))
+        result = cursor.fetchone()
+        
+        if result:
+            id_empleado, nombre, apellido, email_db, contraseñabd, puesto = result
+            
+            if bcrypt.checkpw(contra.encode('utf-8'), contraseñabd.encode('utf-8')):
+                if puesto == 'gerente':
+                    instancia = Gerente(nombre, apellido, email_db, contraseñabd)
+                    cursor.close
+                    conexion.close()
+                else:
+                    instancia = Empleados(nombre, apellido, email_db, contraseñabd, puesto)
+                    cursor.close()
+                    conexion.close()
+                
+                print(f"Bienvenido {nombre}")
+                return instancia
+
+        query_cliente = """
+        SELECT id_usuario, nombre, apellido, email, password, rfc, telefono
+        FROM CLIENTES
+        WHERE email = %s
+        """
+        cursor,conexion=Utilidades.cursor()
+        cursor.execute(query_cliente, (email,))
+        result = cursor.fetchone()
+        
+        if result:
+            id_usuario, nombre, apellido, email_db, contraseñabd, rfc, telefono = result
+            
+            if bcrypt.checkpw(contra.encode('utf-8'), contraseñabd.encode('utf-8')):
+                instancia = Cliente(nombre, apellido, email_db, contraseñabd, rfc=rfc, telefono=telefono, id_cliente=id_usuario)
+                print(f"Bienvenido {nombre}")
+                cursor.close()
+                conexion.close()
+                return instancia
+                
+        print("Correo o contraseña incorrectos")
+        return None
+    
+    except Exception as e:      
+        print(f"Error al iniciar sesión: {e}")
+        return None
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conexion is not None:
+            conexion.close()
